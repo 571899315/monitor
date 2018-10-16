@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+    http://www.springframework.org/schema/rabbit
+    http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+	<bean id="receiver" class="com.rpc.rpcx.Receiver"/>
+
+	<bean id="businessMonitorAspect" class="monitor.utils.BusinessMonitorAspect" />
+
+	<aop:config>
+		<aop:aspect id="businessMonitorAspect"
+			ref="businessMonitorAspect" order="200">
+			<aop:pointcut id="businessMonitorPointcut"
+				expression="@annotation(monitor.domain.BusinessMonitor)" />
+			<aop:after-returning method="afterReturn"
+				pointcut-ref="businessMonitorPointcut" returning="ret" />
+		</aop:aspect>
+	</aop:config>
+	
+	<bean id="IdGenerator" class="monitor.metrics.common.IdGenerator"/>
+	
+	<bean id="metricsTimer" class="monitor.metrics.MetricsTimer">
+		<property name="rabbitTemplate" ref="rabbitTemplate"/>
+		<property name="topic" value="monitor"/>
+		
+	</bean>
+</beans>

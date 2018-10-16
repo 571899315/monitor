@@ -1,0 +1,6 @@
+server:
+  port: 8081
+  context: /
+spring:
+  application:
+    name: consumer
